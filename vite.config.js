@@ -7788,6 +7788,20 @@ export default defineConfig(({ mode }) => {
         'Content-Security-Policy': "frame-ancestors 'none'",
       },
     },
+    // `vite preview` (self-hosted/container production runs) has its own host
+    // binding separate from `server` above; mirror the same LAN opt-in and
+    // framing headers so a container deploy behaves like the dev server.
+    preview: {
+      host: env.HOST || 'localhost',
+      port: parseInt(env.PORT, 10) || 4173,
+      allowedHosts: (env.HOST === '0.0.0.0' || env.HOST === '::')
+        ? true
+        : localAllowedHosts,
+      headers: {
+        'X-Frame-Options': 'DENY',
+        'Content-Security-Policy': "frame-ancestors 'none'",
+      },
+    },
     // Expose selected API keys to the browser via import.meta.env.*
     define: {
       'import.meta.env.GOOGLE_MAPS_API_KEY': JSON.stringify(env.GOOGLE_MAPS_API_KEY),
